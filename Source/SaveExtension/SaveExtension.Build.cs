@@ -20,7 +20,12 @@ public class SaveExtension : ModuleRules
 				"AIModule",
 				"CoreUObject",
 				"ImageWrapper",
-				"NavigationSystem"
+				"NavigationSystem",
+			}
+		);
+		PrivateDependencyModuleNames.AddRange(
+			new string[] {
+				"GameplayAbilities"
 			}
 		);
 	}

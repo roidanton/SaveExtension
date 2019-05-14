@@ -5,7 +5,7 @@
 
 #include "ISaveExtension.h"
 
- #include <CoreMinimal.h>
+#include <CoreMinimal.h>
 #include <Engine/LevelStreaming.h>
 #include <Engine/LevelScriptActor.h>
 #include <GameFramework/SaveGame.h>
@@ -57,7 +57,7 @@ struct FObjectRecord : public FBaseRecord {
 	FObjectRecord() : Super(), Class(nullptr) {}
 	FObjectRecord(const UObject* Object);
 
-	virtual bool Serialize(FArchive& Ar) override;
+	bool Serialize(FArchive& Ar) override;
 
 	bool IsValid() const {
 		return !Name.IsNone() && Class && Data.Num() > 0;
@@ -74,7 +74,7 @@ struct FComponentRecord : public FObjectRecord {
 
 	FTransform Transform;
 
-	virtual bool Serialize(FArchive& Ar) override;
+	bool Serialize(FArchive& Ar) override;
 };
 
 
@@ -96,7 +96,7 @@ struct FActorRecord : public FObjectRecord {
 	FActorRecord() : Super() {}
 	FActorRecord(const AActor* Actor) : Super(Actor) {}
 
-	virtual bool Serialize(FArchive& Ar) override;
+	bool Serialize(FArchive& Ar) override;
 };
 
 
@@ -111,7 +111,7 @@ struct FControllerRecord : public FActorRecord {
 	FControllerRecord() : Super() {}
 	FControllerRecord(const AActor* Actor) : Super(Actor) {}
 
-	virtual bool Serialize(FArchive& Ar) override;
+	bool Serialize(FArchive& Ar) override;
 };
 
 
@@ -132,7 +132,7 @@ struct FLevelRecord : public FBaseRecord {
 
 	FLevelRecord() : Super() {}
 
-	virtual bool Serialize(FArchive& Ar) override;
+	bool Serialize(FArchive& Ar) override;
 
 	bool IsValid() const {
 		return !Name.IsNone();
@@ -186,6 +186,9 @@ struct FSaveExtensionArchive : public FObjectAndNameAsStringProxyArchive
 	// Courtesy of Colin Bonstead
 	SAVEEXTENSION_API FArchive& operator<<(struct FSoftObjectPtr& Value);
 	SAVEEXTENSION_API FArchive& operator<<(struct FSoftObjectPath& Value);
+
+	// Handle UAttributeSet from GAS plugin.
+	SAVEEXTENSION_API FArchive& operator<<(UObject*& Value) override;
 };
 
 
@@ -235,5 +238,5 @@ public:
 	FName GetFMap() const { return { *Map }; }
 
 	/** Using manual serialization. It's way faster than reflection serialization */
-	virtual void Serialize(FArchive& Ar) override;
+	void Serialize(FArchive& Ar) override;
 };

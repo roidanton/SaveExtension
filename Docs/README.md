@@ -20,7 +20,9 @@ Check [Quick Start](quick-start.md) to see how to setup and configure the plugin
 
 #### SaveGame tag saving
 
-Any variable tagged as `SaveGame` will be saved.
+Any variable tagged as `SaveGame` will be saved. `FGameplayAttributeData` of Unreals
+Gameplay Ability System is supported. Tag the `AttributeSet` as well as
+the desired attributes.
 
 #### Full world serialization
 
@@ -45,8 +47,6 @@ All data is structured in the way that levels can be loaded at a minimum cost.
 #### Compression
 
 Files can be compressed, getting up to 20 times smaller file sizes.
-
-
 
 ## About Us
 

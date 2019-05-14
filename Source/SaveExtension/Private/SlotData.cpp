@@ -5,6 +5,8 @@
 
 #include "SavePreset.h"
 
+#include <AbilitySystemComponent.h>
+#include <AttributeSet.h>
 
 /**
  * A macro for tidying up accessing of private members, through the above code
@@ -126,6 +128,30 @@ FArchive& FSaveExtensionArchive::operator<<(FSoftObjectPath& Value)
 	return *this;
 }
 
+FArchive& FSaveExtensionArchive::operator<<(UObject*& Value)
+{
+	if (Value->GetClass()->IsChildOf<UAttributeSet>())
+	{
+		for (TFieldIterator<UProperty>It(Value->GetClass()); It; ++It)
+		{
+			const auto propertyFlags = It->GetPropertyFlags();
+			if ((propertyFlags & CPF_SaveGame) == CPF_SaveGame)
+			{
+				const auto attr = static_cast<FGameplayAttribute>(*It);
+				const auto attrSet = Cast<UAttributeSet>(Value);
+				const auto attrData = attr.GetGameplayAttributeDataChecked(attrSet);
+				auto baseValue = attrData->GetBaseValue();
+				*this << baseValue; // write to `this` when saving, write to `baseValue` when loading
+				if (baseValue != attrData->GetBaseValue()) // to avoid resetting the base value when loading
+				{
+					auto asc = attrSet->GetOwningAbilitySystemComponent();
+					asc->SetNumericAttributeBase(attr, baseValue);
+				}
+			}
+		}
+	}
+	return FObjectAndNameAsStringProxyArchive::operator<<(Value);
+}
 
 /////////////////////////////////////////////////////
 // USlotData
